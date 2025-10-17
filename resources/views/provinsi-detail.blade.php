@@ -37,7 +37,7 @@
             margin-right: 8px;
             border-radius: 3px;
         }
-        
+
         .color-81-100 { fill: #34D399; } /* Hijau terang */
         .color-61-80 { fill: #2D9CDB; } /* Biru terang */
         .color-41-60 { fill: #F7BF4F; } /* Kuning */
@@ -128,9 +128,6 @@
                 <select class="border rounded-md py-2 px-4 pr-8 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Dinas Kesehatan DKI Jakarta</option>
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
             </div>
         </div>
         <h1 class="text-2xl font-bold text-gray-800">ASPAK KEMENKES</h1>
@@ -203,567 +200,85 @@
         </div>
     </div>
 
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const provinsisData = @json($provinsis);
-        const pointsData = @json($pointsOfInterest);
-        const mapContainer = document.getElementById('map-container');
-        const tooltip = document.getElementById('map-tooltip');
-        const svgElement = mapContainer.querySelector('svg');
-        const kondisiProvinsi = document.getElementById('kondisi-provinsi');
-        const rekomendasiProvinsi = document.getElementById('rekomendasi-provinsi');
-        const currentDate = document.getElementById('current-date');
-        const currentTime = document.getElementById('current-time');
-
-        function addPointsOfInterest() {
-            if (!svgElement || !pointsData || pointsData.length === 0) {
-                console.log("SVG Element or Points Data not found. Stopping.");
-                return;
-            }
-
-            const poiGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            svgElement.appendChild(poiGroup);
-
-            pointsData.forEach(point => {
-                // Step 1: Find the province name using the provinsi_id from the point.
-                let provinsiName = null;
-                for (const name in provinsisData) {
-                    if (provinsisData[name].id === point.provinsi_id) {
-                        provinsiName = provinsisData[name].nama;
-                        break;
-                    }
-                }
-
-                // DEBUGGING: Check if we found the province name.
-                if (!provinsiName) {
-                    console.error(`Could not find a province with ID: ${point.provinsi_id}`);
-                    return; // Skip this point if province not found
-                }
-
-                // Step 2: Use the found name to get the SVG element.
-                const svgId = provinsiName.replace(/ /g, '_');
-                const pathElement = svgElement.querySelector(`#${svgId}`);
-
-                // DEBUGGING: Check if we found the SVG path.
-                if (!pathElement) {
-                    console.error(`Could not find SVG path with ID: #${svgId}`);
-                    return; // Skip if path not found
-                }
-
-                // Step 3: Calculate center and draw the point (this logic is correct).
-                const bbox = pathElement.getBBox();
-                const cx = bbox.x + bbox.width / 2;
-                const cy = bbox.y + bbox.height / 2;
-
-                const pulseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                pulseCircle.setAttribute('cx', cx);
-                pulseCircle.setAttribute('cy', cy);
-                pulseCircle.setAttribute('class', 'poi-dot poi-pulse');
-                
-                const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                mainCircle.setAttribute('cx', cx);
-                mainCircle.setAttribute('cy', cy);
-                mainCircle.setAttribute('r', '3');
-                mainCircle.setAttribute('class', 'poi-dot');
-                
-                poiGroup.appendChild(pulseCircle);
-                poiGroup.appendChild(mainCircle);
-
-                // Add tooltip events
-                poiGroup.addEventListener('mouseover', () => { /* ... tooltip code ... */ });
-                poiGroup.addEventListener('mouseleave', () => { /* ... tooltip code ... */ });
-                poiGroup.addEventListener('mousemove', (e) => { /* ... tooltip code ... */ });
-            });
-        }
-
-        // --- EVENT LISTENERS FOR PROVINCES (No changes here) ---
-        mapContainer.querySelectorAll('path.land').forEach(path => {
-            // ... all your existing mouseover, mouseleave, and click events ...
-        });
-        
-
-        function updateDateTime() {
-            const now = new Date();
-            const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            currentDate.textContent = now.toLocaleDateString('id-ID', optionsDate);
-            currentTime.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\./g, ':');
-        }
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-
-        function getClassNameByPersentase(persentase) {
-            if (persentase >= 81) return 'color-81-100';
-            if (persentase >= 61) return 'color-61-80';
-            if (persentase >= 41) return 'color-41-60';
-            if (persentase >= 21) return 'color-21-40';
-            return 'color-0-20';
-        }
-
-        function getTingkatanByPersentase(persentase) {
-            if (persentase >= 81) return '81-100%';
-            if (persentase >= 61) return '61-80%';
-            if (persentase >= 41) return '41-60%';
-            if (persentase >= 21) return '21-40%';
-            return '0-20%';
-        }
-
-        // Menerapkan warna pada peta berdasarkan data
-        for (const namaProvinsi in provinsisData) {
-            // Mengganti spasi dengan underscore agar cocok dengan ID di SVG
-            const provinsiId = namaProvinsi.replace(/ /g, '_');
-            const pathElement = mapContainer.querySelector(`#${provinsiId}`);
-            if (pathElement) {
-                const persentase = provinsisData[namaProvinsi].persentase;
-                pathElement.classList.add(getClassNameByPersentase(persentase));
-            }
-        }
-
-        mapContainer.querySelectorAll('path.land').forEach(path => {
-
-            path.addEventListener('mouseover', function() {
-                const provinsiId = this.id;
-                const namaProvinsi = provinsiId.replace(/_/g, ' '); 
-                const data = provinsisData[namaProvinsi]; 
-                if (data) {
-                    tooltip.innerHTML = `<strong>${data.nama}</strong><br>${data.persentase}%`;
-                    tooltip.classList.remove('hidden');
-                }
-            });
-
-            path.addEventListener('mouseleave', function() {
-                tooltip.classList.add('hidden');
-            });
-
-            path.addEventListener('mousemove', function(e) {
-                tooltip.style.left = (e.pageX + 15) + 'px';
-                tooltip.style.top = (e.pageY + 15) + 'px';
-            });
-
-            path.addEventListener('click', function() {
-                const provinsiId = this.id;
-                const namaProvinsi = provinsiId.replace(/_/g, ' ');
-                const data = provinsisData[namaProvinsi];
-
-                if (data) {
-                    kondisiProvinsi.innerHTML = `
-                        <p class="text-xl font-bold">${data.nama}</p>
-                        <p class="text-lg">Tingkat Ketersediaan: <span class="font-bold">${getTingkatanByPersentase(data.persentase)}</span></p>
-                        <p class="text-lg">Persentase: <span class="font-bold">${data.persentase}%</span></p>
-                    `;
-                    
-                    let rekomendasiText = '';
-                    if (data.persentase >= 81) {
-                        rekomendasiText = 'Ketersediaan sangat baik. Pertahankan.';
-                    } else if (data.persentase >= 61) {
-                        rekomendasiText = 'Ketersediaan baik. Perlu pemantauan rutin.';
-                    } else if (data.persentase >= 41) {
-                        rekomendasiText = 'Ketersediaan cukup. Evaluasi kebutuhan dan lakukan penyesuaian.';
-                    } else if (data.persentase >= 21) {
-                        rekomendasiText = 'Ketersediaan kurang. Diperlukan tindakan segera untuk peningkatan.';
-                    } else {
-                        rekomendasiText = 'Ketersediaan sangat rendah. Urgent untuk dilakukan intervensi.';
-                    }
-                    rekomendasiProvinsi.textContent = rekomendasiText;
-                } else {
-                    kondisiProvinsi.textContent = `Data untuk ID ${namaProvinsi} tidak ditemukan.`;
-                    rekomendasiProvinsi.textContent = '';
-                }
-            });
-        });
-
-        let isPanning = false;
-        let startX = 0, startY = 0;
-        let viewBox = { x: 0, y: 0, width: 0, height: 0 };
-
-        const MIN_ZOOM = 0.5;   
-        const MAX_ZOOM = 8;     
-        let currentZoom = 1;
-
-        if (svgElement) {
-            const vb = svgElement.getAttribute('viewBox');
-            if (vb) {
-                const parts = vb.split(' ').map(parseFloat);
-                viewBox = { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
-            } else {
-                const bbox = svgElement.getBBox();
-                svgElement.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-                viewBox = { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
-            }
-        }
-
-        const originalViewBox = { ...viewBox };
-
-
-        svgElement.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const zoomSpeed = 1.2;
-            const direction = e.deltaY < 0 ? 1 : -1;
-            const scale = direction > 0 ? (1 / zoomSpeed) : zoomSpeed;
-
-            let newZoom = currentZoom * (direction > 0 ? zoomSpeed : 1 / zoomSpeed);
-            if (newZoom > MAX_ZOOM) newZoom = MAX_ZOOM;
-            if (newZoom < MIN_ZOOM) newZoom = MIN_ZOOM;
-
-            const actualScale = newZoom / currentZoom;
-            currentZoom = newZoom;
-
-            const pt = svgElement.createSVGPoint();
-            pt.x = e.offsetX;
-            pt.y = e.offsetY;
-            const cursorPt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
-
-            viewBox.x = cursorPt.x - (cursorPt.x - viewBox.x) * actualScale;
-            viewBox.y = cursorPt.y - (cursorPt.y - viewBox.y) * actualScale;
-            viewBox.width *= actualScale;
-            viewBox.height *= actualScale;
-
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-        });
-
-        // Pan (geser peta)
-        svgElement.addEventListener('mousedown', (e) => {
-            isPanning = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            svgElement.style.cursor = "grabbing";
-        });
-
-        svgElement.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
-            const dx = (e.clientX - startX) * (viewBox.width / svgElement.clientWidth);
-            const dy = (e.clientY - startY) * (viewBox.height / svgElement.clientHeight);
-            viewBox.x -= dx;
-            viewBox.y -= dy;
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-            startX = e.clientX;
-            startY = e.clientY;
-        });
-
-        svgElement.addEventListener('mouseup', () => {
-            isPanning = false;
-            svgElement.style.cursor = "grab";
-        });
-        svgElement.addEventListener('mouseleave', () => {
-            isPanning = false;
-            svgElement.style.cursor = "default";
-        });
-
-        // --- Tombol Kontrol Zoom ---
-        const zoomControls = document.createElement('div');
-        zoomControls.style.position = 'absolute';
-        zoomControls.style.top = '20px';
-        zoomControls.style.right = '20px';
-        zoomControls.style.zIndex = '9999';
-        zoomControls.style.display = 'flex';
-        zoomControls.style.flexDirection = 'column';
-        zoomControls.style.gap = '8px';
-
-        zoomControls.innerHTML = `
-        <button id="zoom-in" style="padding:6px 10px;background:#2e7d32;color:white;border:none;border-radius:4px;font-size:18px;cursor:pointer;">+</button>
-        <button id="zoom-out" style="padding:6px 10px;background:#c62828;color:white;border:none;border-radius:4px;font-size:18px;cursor:pointer;">−</button>
-        <button id="reset-zoom" style="padding:6px 10px;background:#1565c0;color:white;border:none;border-radius:4px;font-size:16px;cursor:pointer;">⟳</button>
-        `;
-        zoomControls.classList.add('zoom-controls');
-        mapContainer.appendChild(zoomControls);
-
-
-        // Fungsi bantu zoom manual
-        function applyZoom(scaleFactor) {
-            const newZoom = currentZoom * scaleFactor;
-            if (newZoom > MAX_ZOOM || newZoom < MIN_ZOOM) return;
-
-            currentZoom = newZoom;
-            const centerX = viewBox.x + viewBox.width / 2;
-            const centerY = viewBox.y + viewBox.height / 2;
-            viewBox.width /= scaleFactor;
-            viewBox.height /= scaleFactor;
-            viewBox.x = centerX - viewBox.width / 2;
-            viewBox.y = centerY - viewBox.height / 2;
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-        }
-
-        // Event tombol
-        document.getElementById('zoom-in').addEventListener('click', () => applyZoom(1.2));
-        document.getElementById('zoom-out').addEventListener('click', () => applyZoom(1 / 1.2));
-        document.getElementById('reset-zoom').addEventListener('click', () => {
-            currentZoom = 1;
-            viewBox = { ...originalViewBox };
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-        });
-        addPointsOfInterest();
-    });
-</script> -->
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-            const kabupatensData = @json($kabupatens);
-            const pointsData = @json($pointsOfInterest);
-            const mapContainer = document.getElementById('map-container');
-            const tooltip = document.getElementById('map-tooltip');
-            const kondisiKab = document.getElementById('kondisi-kabupaten');
-            const rekomendasiKab = document.getElementById('rekomendasi-kabupaten');
-            const currentDate = document.getElementById('current-date');
-            const currentTime = document.getElementById('current-time');
+document.addEventListener('DOMContentLoaded', function () {
+    const kabupatensData = @json($kabupatens);
+    const pointsData = @json($pointsOfInterest);
+    const mapContainer = document.getElementById('map-container');
+    const svgElement = mapContainer.querySelector('svg');
+    const tooltip = document.getElementById('map-tooltip');
+    const kondisiKab = document.getElementById('kondisi-kabupaten');
+    const rekomendasiKab = document.getElementById('rekomendasi-kabupaten');
+    const currentDate = document.getElementById('current-date');
+    const currentTime = document.getElementById('current-time');
 
-        function updateDateTime() {
-            const now = new Date();
-            const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            currentDate.textContent = now.toLocaleDateString('id-ID', optionsDate);
-            currentTime.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\./g, ':');
-        }
+    function updateDateTime() {
+        const now = new Date();
+        const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        currentDate.textContent = now.toLocaleDateString('id-ID', optionsDate);
+        currentTime.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\./g, ':');
+    }
 
-        function getClassNameByPersentase(p) {
-            if (p >= 81) return 'color-81-100';
-            if (p >= 61) return 'color-61-80';
-            if (p >= 41) return 'color-41-60';
-            if (p >= 21) return 'color-21-40';
-            return 'color-0-20';
-        }
+    function getClassNameByPersentase(p) {
+        if (p >= 81) return 'color-81-100';
+        if (p >= 61) return 'color-61-80';
+        if (p >= 41) return 'color-41-60';
+        if (p >= 21) return 'color-21-40';
+        return 'color-0-20';
+    }
 
-        function getTingkatanByPersentase(p) {
-            if (p >= 81) return '81-100%';
-            if (p >= 61) return '61-80%';
-            if (p >= 41) return '41-60%';
-            if (p >= 21) return '21-40%';
-            return '0-20%';
-        }
+    function addPointsOfInterest() {
+        const poiGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        svgElement.appendChild(poiGroup);
 
-        function addPointsOfInterest() {
-            console.log("--- Memulai Debug Titik Lokasi ---");
+        pointsData.forEach(point => {
+            const targetKabupatenName = Object.keys(kabupatensData)
+                .find(k => kabupatensData[k].id === point.kabupaten_id);
 
-            if (!svgElement || !pointsData || pointsData.length === 0) {
-                console.warn(" PERINGATAN: Elemen SVG atau data 'pointsData' tidak ditemukan/kosong.");
+            if (!targetKabupatenName) {
+                console.error(` GAGAL: Tidak menemukan kabupaten/kota dengan ID: ${point.kabupaten_id}`);
                 return;
             }
-            console.log(" Data Titik Lokasi Diterima:", pointsData);
 
-            const poiGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            svgElement.appendChild(poiGroup);
+            const svgId = targetKabupatenName.replace(/ /g, '_');
+            const pathElement = svgElement.querySelector(`#${svgId}`);
+            if (!pathElement) return;
 
-            pointsData.forEach(point => {
-                console.log(`Memproses titik: "${point.nama}" (kabupaten_id: ${point.kabupaten_id})`);
-                
-                let targetKabupatenName = null;
-                for (const name in kabupatensData) {
-                    if (kabupatensData[name].id === point.kabupaten_id) {
-                        targetKabupatenName = name;
-                        break;
-                    }
-                }
+            const bbox = pathElement.getBBox();
+            const cx = bbox.x + bbox.width / 2;
+            const cy = bbox.y + bbox.height / 2;
 
-                if (!targetKabupatenName) {
-                    console.error(` GAGAL: Tidak menemukan kabupaten/kota dengan ID: ${point.kabupaten_id});
-                    return;
-                }
-                console.log(` Nama kabupaten ditemukan: "${targetKabupatenName}"`);
+            const groupWrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            const pulseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pulseCircle.setAttribute('cx', cx);
+            pulseCircle.setAttribute('cy', cy);
+            pulseCircle.setAttribute('class', 'poi-dot poi-pulse');
+            const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            mainCircle.setAttribute('cx', cx);
+            mainCircle.setAttribute('cy', cy);
+            mainCircle.setAttribute('r', '3');
+            mainCircle.setAttribute('class', 'poi-dot');
 
-                const svgId = targetKabupatenName.replace(/ /g, '_');
-                const pathElement = svgElement.querySelector(`#${svgId}`);
+            groupWrapper.appendChild(pulseCircle);
+            groupWrapper.appendChild(mainCircle);
+            poiGroup.appendChild(groupWrapper);
 
-                if (!pathElement) {
-                    console.error(` GAGAL: Tidak menemukan path SVG dengan ID #${svgId}. Pastikan ID di dalam kode SVG Anda sudah benar dan cocok (misal: 'DKI_Jakarta').`);
-                    return;
-                }
-                console.log(` Path SVG #${svgId} ditemukan.`);
-
-                const bbox = pathElement.getBBox();
-                const cx = bbox.x + bbox.width / 2;
-                const cy = bbox.y + bbox.height / 2;
-                console.log(`Menggambar titik di koordinat SVG (x: ${cx}, y: ${cy})`);
-
-                // Titik luar yang berkedip
-                const pulseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                pulseCircle.setAttribute('cx', cx);
-                pulseCircle.setAttribute('cy', cy);
-                pulseCircle.setAttribute('class', 'poi-dot poi-pulse');
-                
-                // Titik utama
-                const mainCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                mainCircle.setAttribute('cx', cx);
-                mainCircle.setAttribute('cy', cy);
-                mainCircle.setAttribute('r', '3');
-                mainCircle.setAttribute('class', 'poi-dot');
-                
-                poiGroup.appendChild(pulseCircle);
-                poiGroup.appendChild(mainCircle);
-
-                // Event untuk tooltip
-                const groupWrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                groupWrapper.appendChild(pulseCircle);
-                groupWrapper.appendChild(mainCircle);
-                
-                groupWrapper.addEventListener('mouseover', () => {
-                    tooltip.innerHTML = `<strong>${point.nama}</strong><br>${point.alamat}`;
-                    tooltip.classList.remove('hidden');
-                });
-                groupWrapper.addEventListener('mouseleave', () => {
-                    tooltip.classList.add('hidden');
-                });
-                groupWrapper.addEventListener('mousemove', (e) => {
-                    tooltip.style.left = (e.pageX + 15) + 'px';
-                    tooltip.style.top = (e.pageY + 15) + 'px';
-                });
-                svgElement.appendChild(groupWrapper);
-            });
-        
-
-        // Jalankan update waktu
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-
-        // Warnai peta
-        for (const namaKabupaten in kabupatensData) {
-            const pathElement = mapContainer.querySelector(`[id="${namaKabupaten}"]`);
-            if (pathElement) {
-                pathElement.classList.add('kabupaten');
-                pathElement.classList.add(getClassNameByPersentase(kabupatensData[namaKabupaten].persentase));
-            } else {
-                console.warn(`Peringatan: Path SVG dengan id="${namaKabupaten}" tidak ditemukan.`);
-            }
-        }
-
-
-        mapContainer.querySelectorAll('path').forEach(path => {
-            const data = kabupatensData[path.id];
-            if (!data) return;
-
-            // Event Hover
-            path.addEventListener('mouseover', function() {
-                tooltip.innerHTML = `<strong>${data.nama}</strong><br>${data.persentase}%`;
+            groupWrapper.addEventListener('mouseover', () => {
+                tooltip.innerHTML = `<strong>${point.nama}</strong><br>${point.alamat}`;
                 tooltip.classList.remove('hidden');
             });
-            path.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
-            path.addEventListener('mousemove', e => {
-                tooltip.style.left = (e.pageX + 15) + 'px';
-                tooltip.style.top = (e.pageY + 15) + 'px';
+            groupWrapper.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+            groupWrapper.addEventListener('mousemove', e => {
+                tooltip.style.left = (e.clientX + 15) + 'px';
+                tooltip.style.top = (e.clientY + 15) + 'px';
             });
-
-            // Event Klik
-            path.addEventListener('click', function() {
-                kondisiKab.innerHTML = `<p class="text-xl font-bold">${data.nama}</p><p>Tingkat Ketersediaan: <strong>${getTingkatanByPersentase(data.persentase)}</strong></p>`;
-                rekomendasiKab.textContent = "Rekomendasi untuk " + data.nama;
-            });
-
-        let isPanning = false;
-        let startX = 0, startY = 0;
-        let viewBox = { x: 0, y: 0, width: 0, height: 0 };
-
-        const MIN_ZOOM = 0.5;   
-        const MAX_ZOOM = 8;     
-        let currentZoom = 1;
-
-        if (svgElement) {
-            const vb = svgElement.getAttribute('viewBox');
-            if (vb) {
-                const parts = vb.split(' ').map(parseFloat);
-                viewBox = { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
-            } else {
-                const bbox = svgElement.getBBox();
-                svgElement.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-                viewBox = { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
-            }
-        }
-
-        const originalViewBox = { ...viewBox };
-
-        svgElement.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const zoomSpeed = 1.2;
-            const direction = e.deltaY < 0 ? 1 : -1;
-            const scale = direction > 0 ? (1 / zoomSpeed) : zoomSpeed;
-
-            let newZoom = currentZoom * (direction > 0 ? zoomSpeed : 1 / zoomSpeed);
-            if (newZoom > MAX_ZOOM) newZoom = MAX_ZOOM;
-            if (newZoom < MIN_ZOOM) newZoom = MIN_ZOOM;
-
-            const actualScale = newZoom / currentZoom;
-            currentZoom = newZoom;
-
-            const pt = svgElement.createSVGPoint();
-            pt.x = e.offsetX;
-            pt.y = e.offsetY;
-            const cursorPt = pt.matrixTransform(svgElement.getScreenCTM().inverse());
-
-            viewBox.x = cursorPt.x - (cursorPt.x - viewBox.x) * actualScale;
-            viewBox.y = cursorPt.y - (cursorPt.y - viewBox.y) * actualScale;
-            viewBox.width *= actualScale;
-            viewBox.height *= actualScale;
-
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
         });
+    }
 
-        svgElement.addEventListener('mousedown', (e) => {
-            isPanning = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            svgElement.style.cursor = "grabbing";
-        });
-
-        svgElement.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
-            const dx = (e.clientX - startX) * (viewBox.width / svgElement.clientWidth);
-            const dy = (e.clientY - startY) * (viewBox.height / svgElement.clientHeight);
-            viewBox.x -= dx;
-            viewBox.y -= dy;
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-            startX = e.clientX;
-            startY = e.clientY;
-        });
-
-        svgElement.addEventListener('mouseup', () => {
-            isPanning = false;
-            svgElement.style.cursor = "grab";
-        });
-        svgElement.addEventListener('mouseleave', () => {
-            isPanning = false;
-            svgElement.style.cursor = "default";
-        });
-
-        const zoomControls = document.createElement('div');
-        zoomControls.style.position = 'absolute';
-        zoomControls.style.top = '20px';
-        zoomControls.style.right = '20px';
-        zoomControls.style.zIndex = '9999';
-        zoomControls.style.display = 'flex';
-        zoomControls.style.flexDirection = 'column';
-        zoomControls.style.gap = '8px';
-
-        zoomControls.innerHTML = `
-        <button id="zoom-in" style="padding:6px 10px;background:#2e7d32;color:white;border:none;border-radius:4px;font-size:18px;cursor:pointer;">+</button>
-        <button id="zoom-out" style="padding:6px 10px;background:#c62828;color:white;border:none;border-radius:4px;font-size:18px;cursor:pointer;">−</button>
-        <button id="reset-zoom" style="padding:6px 10px;background:#1565c0;color:white;border:none;border-radius:4px;font-size:16px;cursor:pointer;">⟳</button>
-        `;
-        zoomControls.classList.add('zoom-controls');
-        mapContainer.appendChild(zoomControls);
-
-        function applyZoom(scaleFactor) {
-            const newZoom = currentZoom * scaleFactor;
-            if (newZoom > MAX_ZOOM || newZoom < MIN_ZOOM) return;
-
-            currentZoom = newZoom;
-            const centerX = viewBox.x + viewBox.width / 2;
-            const centerY = viewBox.y + viewBox.height / 2;
-            viewBox.width /= scaleFactor;
-            viewBox.height /= scaleFactor;
-            viewBox.x = centerX - viewBox.width / 2;
-            viewBox.y = centerY - viewBox.height / 2;
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-        }
-
-        document.getElementById('zoom-in').addEventListener('click', () => applyZoom(1.2));
-        document.getElementById('zoom-out').addEventListener('click', () => applyZoom(1 / 1.2));
-        document.getElementById('reset-zoom').addEventListener('click', () => {
-            currentZoom = 1;
-            viewBox = { ...originalViewBox };
-            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
-        });
-
-        
-        // fungsi untuk menambahkan titik lokasi
-        addPointsOfInterest();
-    });
-    
- 
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    addPointsOfInterest();
+});
 </script>
 </body>
 </html>

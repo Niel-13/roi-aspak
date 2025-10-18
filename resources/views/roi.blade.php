@@ -136,7 +136,7 @@
 
         <h1 class="text-xl font-semibold text-gray-700 text-center">ASPAK KEMENKES</h1>
 
-        <div class="navbar flex space-x-1 text-center">
+        <div class="navbar flex space-x-1 text-center justify-center items-center">
             <a href="#" class="active text-sm py-1 px-3 rounded-md">Rumah Sakit</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Sarana</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Prasarana</a>
@@ -193,7 +193,7 @@
                     </g>
                 </svg>
 
-                <div id="map-legend" class="absolute bottom-4 left-4 bg-white bg-opacity-80 p-3 rounded-md shadow text-xs z-10">
+                <div id="map-legend" class="absolute bottom-4 left-4 bg-gray-200 bg-opacity-80 p-3 rounded-md shadow text-xs z-10">
                 <h3 class="font-semibold mb-2">Legend</h3>
                     <div class="space-y-2">
                         <div class="flex items-center">

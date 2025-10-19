@@ -39,10 +39,10 @@
             border-radius: 2px;
         }
 
-        .color-81-100 { fill: #34D399; } /* Hijau terang */
-        .color-61-80 { fill: #2D9CDB; } /* Biru terang */
-        .color-41-60 { fill: #F7BF4F; } /* Kuning */
-        .color-21-40 { fill: #FF7B7B; } /* Merah muda */
+        .color-81-100 { fill: #2D9CDB; } /* Biru terang */
+        .color-61-80 { fill: #34D399; } /* Hijau terang */
+        .color-41-60 { fill: #FFFF00; } /* Kuning */
+        .color-21-40 { fill: #FFA500; } /* Orange */
         .color-0-20 { fill: #EF4444; } /* Merah */
 
         #indonesia-map path {
@@ -197,16 +197,16 @@
                 <h3 class="font-semibold mb-2">Legend</h3>
                     <div class="space-y-2">
                         <div class="flex items-center">
-                            <span class="legend-box bg-green-400 color-81-100"></span> <span>81-100%</span>
+                            <span class="legend-box bg-blue-400 color-81-100"></span> <span>81-100%</span>
                         </div>
                         <div class="flex items-center">
-                            <span class="legend-box bg-blue-400 color-61-80"></span> <span>61-80%</span>
+                            <span class="legend-box bg-green-400 color-61-80"></span> <span>61-80%</span>
                         </div>
                         <div class="flex items-center">
-                            <span class="legend-box bg-yellow-400 color-41-60"></span> <span>41-60%</span>
+                            <span class="legend-box bg-yellow-200 color-41-60"></span> <span>41-60%</span>
                         </div>
                         <div class="flex items-center">
-                            <span class="legend-box bg-red-300 color-21-40"></span> <span>21-40%</span>
+                            <span class="legend-box bg-yellow-500 color-21-40"></span> <span>21-40%</span>
                         </div>
                         <div class="flex items-center">
                             <span class="legend-box bg-red-600 color-0-20"></span> <span>0-20%</span>

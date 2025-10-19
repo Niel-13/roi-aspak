@@ -39,12 +39,34 @@ class DashboardController extends Controller
         $kabupatens = $provinsi->kabupaten()->get()->keyBy('nama'); 
         $pointsOfInterest = $provinsi->pointsOfInterest()->get();
         $currentDateTime = \Carbon\Carbon::now();
+        $namaFileSvg = strtolower(str_replace(' ', '_', $provinsi->nama)) . '.svg'; 
+        $all_provinsis = Provinsi::all()->keyBy('nama');
+        
 
         return view('provinsi-detail', [
             'provinsi' => $provinsi,
             'kabupatens' => $kabupatens,
             'pointsOfInterest' => $pointsOfInterest,
-            'currentDateTime' => $currentDateTime
+            'currentDateTime' => $currentDateTime,
+            'namaFileSvg' => $namaFileSvg,
+            'all_provinsis' => $all_provinsis,
+        ]);
+    }
+
+    public function showKabupatenDetail(Kabupaten $kabupaten)
+    {
+        $kabupaten->load('provinsi', 'hospitals');
+        $all_provinsis = Provinsi::all()->keyBy('nama');
+        $currentDateTime = \Carbon\Carbon::now();
+        $namaFileSvg = strtolower(str_replace(' ', '_', $kabupaten->nama)) . '.svg'; 
+
+        return view('kabupaten-detail', [
+            'kabupaten' => $kabupaten,
+            'provinsi' => $kabupaten->provinsi,
+            'hospitals' => $kabupaten->hospitals,
+            'all_provinsis' => $all_provinsis,
+            'currentDateTime' => $currentDateTime,
+            'namaFileSvg' => $namaFileSvg,
         ]);
     }
 

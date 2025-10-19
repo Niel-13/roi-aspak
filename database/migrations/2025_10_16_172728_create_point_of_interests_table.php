@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('provinsi_id')->constrained('provinsis')->onDelete('cascade');
             $table->string('nama');
             $table->string('alamat');
-            $table->decimal('latitude', 10, 7); // Presisi untuk Latitude
-            $table->decimal('longitude', 11, 7); // Presisi untuk Longitude
+            $table->decimal('latitude', 10, 7); 
+            $table->decimal('longitude', 11, 7); 
             $table->timestamps();
         });
     }

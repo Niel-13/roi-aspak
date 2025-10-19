@@ -12,4 +12,10 @@ class Kabupaten extends Model
     {
         return $this->hasMany(PointOfInterest::class);
     }
+    public function provinsi() {
+        return $this->belongsTo(Provinsi::class);
+    }
+    public function hospitals() {
+        return $this->hasMany(Hospital::class);
+    }
 }

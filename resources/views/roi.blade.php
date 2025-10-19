@@ -125,8 +125,11 @@
                 <svg class="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
             <div class="relative">
-                <select class="border rounded-md py-1 px-3 pr-8 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
-                    <option>Kementerian Kesehatan</option>
+                <select id="provinsi-select" class="border rounded-md py-1 px-3 pr-8 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+                    <option value="all" selected>Kementerian Kesehatan</option> {{-- 'all' untuk peta nasional --}}
+                    @foreach($provinsis as $nama_prov => $data_prov)
+                        <option value="{{ $nama_prov }}">{{ $nama_prov }}</option>
+                    @endforeach
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -249,6 +252,22 @@
         const rekomendasiProvinsi = document.getElementById('rekomendasi-provinsi');
         const currentDate = document.getElementById('current-date');
         const currentTime = document.getElementById('current-time');
+        const provinsiSelect = document.getElementById('provinsi-select');
+
+        if (provinsiSelect) {
+            console.log("Event listener untuk 'provinsi-select' (dashboard) berhasil dipasang."); // DEBUG
+            
+            provinsiSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                console.log("Dropdown diubah, nilai baru:", selectedValue); // DEBUG
+
+                if (selectedValue !== 'all') {
+                    window.location.href = `/provinsi/${selectedValue}`;
+                }
+            });
+        } else {
+            console.error("Gagal menemukan elemen #provinsi-select."); // DEBUG
+        }
 
         function updateDateTime() {
             const now = new Date();

@@ -159,7 +159,7 @@
                     if (file_exists($pathSvg)) {
                         echo file_get_contents($pathSvg); 
                     } else {
-                        echo "<p class='text-red-500'>Peta untuk provinsi ini belum tersedia. Pastikan file '{$namaFileSvg}' ada di folder public/images/maps/</p>";
+                        echo "<p class='text-red-500'>Peta untuk provinsi ini belum tersedia. Pastikan file '{$namaFileSvg}' ada</p>";
                     }
                 @endphp
 
@@ -219,6 +219,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentDate = document.getElementById('current-date');
     const currentTime = document.getElementById('current-time');
     const provinsiSelectDetail = document.getElementById('provinsi-select-detail');
+    // const svgId = path.id;
+    // const namaKabupaten = svgId.replace(/_/g, ' ');
+    // const data = kabupatensData[namaKabupaten];
+
 
     if (provinsiSelectDetail) {
         console.log("Event listener untuk 'provinsi-select-detail' (detail) berhasil dipasang."); // DEBUG
@@ -266,60 +270,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const paths = svgElement.querySelectorAll('path');
     paths.forEach(path => {
-        const kabupatenIdDariSvg = path.id;
-        const namaKabupaten = kabupatenIdDariSvg.replace(/_/g, ' ');
+        const svgId = path.id; 
+        const namaKabupaten = svgId.replace(/_/g, ' ');
         const data = kabupatensData[namaKabupaten];
+        
         if (data) {
             const className = getClassNameByPersentase(data.persentase);
+            path.classList.add('kabupaten'); 
             path.classList.add(className);
         }
 
+        // --- 2. Event Listener Klik (Diperbaiki) ---
         path.addEventListener('click', function() {
-            const data = kabupatensData[this.id];
-            if (data) {
-                window.location.href = `/kabupaten/${data.id}`;
-            }
-            if (data) {
-                kondisiKab.innerHTML = `
-                    <p class="text-xl font-bold">${data.nama}</p>
-                    <p class="text-md">Tingkat Ketersediaan: <span class="font-bold">${getTingkatanByPersentase(data.persentase)}</span></p>
-                    <p class="text-md">Persentase: <span class="font-bold">${data.persentase}%</span></p>
-                `;
+            // Ambil data di DALAM event
+            const klikSvgId = this.id;
+            const klikNamaKabupaten = klikSvgId.replace(/_/g, ' ');
+            const klikData = kabupatensData[klikNamaKabupaten];
 
-                let rekomendasiText = '';
-                if (data.persentase >= 81) {
-                    rekomendasiText = 'Ketersediaan sangat baik. Pertahankan.';
-                } else if (data.persentase >= 61) {
-                    rekomendasiText = 'Ketersediaan baik. Perlu pemantauan rutin.';
-                } else if (data.persentase >= 41) {
-                    rekomendasiText = 'Ketersediaan cukup. Evaluasi kebutuhan dan lakukan penyesuaian.';
-                } else if (data.persentase >= 21) {
-                    rekomendasiText = 'Ketersediaan kurang. Diperlukan tindakan segera untuk peningkatan.';
-                } else {
-                    rekomendasiText = 'Ketersediaan sangat rendah. Urgent untuk dilakukan intervensi.';
-                }
-                rekomendasiKab.textContent = rekomendasiText;
-            } else {
-                kondisiKab.textContent = `Data untuk ${namaKabupaten} tidak ditemukan.`;
-                rekomendasiKab.textContent = '';
+            if (klikData) {
+                window.location.href = `/kabupaten/${klikData.id}`;
             }
         });
 
+
         path.addEventListener('mouseover', function(event) {
-            const data = kabupatensData[namaKabupaten];
-            if (data) {
-                tooltip.innerHTML = `<strong>${data.nama}</strong><br>Tingkat: ${getTingkatanByPersentase(data.persentase)}<br>Persentase: ${data.persentase}%`;
+            const hoverSvgId = this.id;
+            const hoverNamaKabupaten = hoverSvgId.replace(/_/g, ' ');
+            const hoverData = kabupatensData[hoverNamaKabupaten];
+
+            if (hoverData) {
+                tooltip.innerHTML = `<strong>${hoverData.nama}</strong><br>Tingkat: ${getTingkatanByPersentase(hoverData.persentase)}<br>Persentase: ${hoverData.persentase}%`;
                 tooltip.classList.remove('hidden');
+                // Update posisi di sini
                 tooltip.style.left = (event.clientX + 15) + 'px';
                 tooltip.style.top = (event.clientY + 15) + 'px';
             }
         });
+
+        // --- 4. Event Listener Mouse Keluar (Tidak Berubah) ---
         path.addEventListener('mouseleave', function() {
             tooltip.classList.add('hidden');
         });
+
+        // --- 5. Event Listener Mouse Bergerak (Hanya Update Posisi) ---
         path.addEventListener('mousemove', function(event) {
-            tooltip.style.left = (event.clientX + 15) + 'px';
-            tooltip.style.top = (event.clientY + 15) + 'px';
+            // Hanya update posisi jika tooltip terlihat
+            if (!tooltip.classList.contains('hidden')) {
+                tooltip.style.left = (event.clientX + 15) + 'px';
+                tooltip.style.top = (event.clientY + 15) + 'px';
+            }
         });
     });
 

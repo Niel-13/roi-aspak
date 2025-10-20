@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             KabupatenSeeder::class,
             PointOfInterestSeeder::class, 
             HospitalSeeder::class,
+            HospitalLayoutSeeder::class,
         ]);
     }
 }

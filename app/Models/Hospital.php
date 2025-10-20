@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Hospital extends Model
 {
     protected $fillable = ['kabupaten_id', 'nama_rs'];
-    public function kabupaten() {
-    return $this->belongsTo(Kabupaten::class);
+        public function kabupaten() {
+        return $this->belongsTo(Kabupaten::class);
+    }
+
+    public function floors() {
+    return $this->hasMany(Floor::class);
 }
 }
+
+

@@ -6,11 +6,10 @@
     <title>Detail: {{ $kabupaten->nama }}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-        }
-        .header {
+<style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; }
+        
+                .header {
             background-color: #ffffff;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -29,43 +28,44 @@
             color: #ffffff;
             border-radius: 0.25rem;
         }
-        .legend-box {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-            border-radius: 3px;
-        }
+        
+        .legend-box { width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+        
+        /* Warna Peta */
+        .color-81-100 { fill: #2D9CDB; } .bg-81-100 { background-color: #2D9CDB; }
+        .color-61-80 { fill: #34D399; } .bg-61-80 { background-color: #34D399; }
+        .color-41-60 { fill: #FFFF00; } .bg-41-60 { background-color: #FFFF00; }
+        .color-21-40 { fill: #FFA500; } .bg-21-40 { background-color: #FFA500; }
+        .color-0-20 { fill: #EF4444; } .bg-0-20 { background-color: #EF4444; }
 
-        .color-81-100 { fill: #34D399; }
-        .color-61-80 { fill: #2D9CDB; }
-        .color-41-60 { fill: #F7BF4F; }
-        .color-21-40 { fill: #FF7B7B; }
-        .color-0-20 { fill: #EF4444; }
-
-        .hospital-label {
+        /* Style untuk Ikon RS (HTML) */
+        .hospital-item {
+            position: absolute;
+            text-align: center;
+            pointer-events: auto; /* Agar bisa di-hover */
+            cursor: pointer;
             font-size: 10px;
             font-weight: bold;
-            fill: #333;
-            text-shadow: 0 0 2px white;
+            color: #333;
+            text-shadow: 0px 0px 3px white;
         }
-
-        #map-container {
-        position: relative;
-        overflow: hidden;
+        .hospital-item img {
+            width: 32px; /* Ukuran ikon statis */
+            height: 32px;
+            margin-bottom: 2px;
         }
-
-        #map-container svg {
-        position: relative;
-        z-index: 1;
-        }
-
-        #map-container .zoom-controls {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
+        
+        /* Style untuk Tooltip */
+        #map-tooltip {
+            position: absolute;
+            z-index: 9999;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -116,6 +116,9 @@
                     }
                 @endphp
 
+               <div id="hospital-layer" class="absolute inset-0 w-full h-full pointer-events-none">
+                    </div>
+
                 <div id="map-legend" class="absolute bottom-4 left-4 bg-gray-200 bg-opacity-80 p-3 rounded-md shadow text-xs z-10">
                 <h3 class="font-semibold mb-2">Legend</h3>
                     <div class="space-y-2">
@@ -151,7 +154,7 @@
             <div class="w-1/2 bg-white p-4 shadow-md rounded-lg">
                 <h3 class="font-semibold text-lg mb-2">Kondisi:</h3>
                 <div id="kondisi-kabupaten" class="text-gray-700 space-y-1">
-                    <p>Pilih kota/kabupaten untuk melihat kondisi.</p>
+                    <p>Pilih untuk melihat kondisi.</p>
                 </div>
             </div>
             <div class="w-1/2 bg-white p-4 shadow-md rounded-lg">
@@ -161,79 +164,102 @@
         </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const kabupaten = @json($kabupaten);
-    const hospitals = @json($hospitals);
-    const provinsiSelectDetail = document.getElementById('provinsi-select-detail');
-    const tooltip = document.getElementById('map-tooltip');
-    const mapContainer = document.getElementById('map-container');
-    const svgElement = mapContainer.querySelector('svg');
-
-    if (provinsiSelectDetail) {
-        console.log("Event listener untuk 'provinsi-select-detail' (detail) berhasil dipasang."); // DEBUG
+    document.addEventListener('DOMContentLoaded', function () {
         
-        provinsiSelectDetail.addEventListener('change', function() {
-            const selectedValue = this.value;
-            console.log("Dropdown diubah, nilai baru:", selectedValue); // DEBUG
+        // 1. DEKLARASI VARIABEL
+        const kabupaten = @json($kabupaten);
+        const hospitals = @json($hospitals);
+        const mapContainer = document.getElementById('map-container');
+        const svgElement = mapContainer.querySelector('svg');
+        const tooltip = document.getElementById('map-tooltip');
+        const currentDate = document.getElementById('current-date');
+        const currentTime = document.getElementById('current-time');
+        const provinsiSelectDetail = document.getElementById('provinsi-select-detail');
 
-            if (selectedValue === 'all') {
-                window.location.href = '/';
-            } else {
-                window.location.href = `/provinsi/${selectedValue}`;
+        // 2. FUNGSI HELPER
+        function updateDateTime() {
+            const now = new Date();
+            const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            currentDate.textContent = now.toLocaleDateString('id-ID', optionsDate);
+            currentTime.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\./g, ':');
+        }
+
+        function getClassNameByPersentase(p) {
+            if (p >= 81) return 'color-81-100';
+            if (p >= 61) return 'color-61-80';
+            if (p >= 41) return 'color-41-60';
+            if (p >= 21) return 'color-21-40';
+            return 'color-0-20';
+        }
+
+        function addPointsOfInterest() {
+            const hospitalLayer = document.getElementById('hospital-layer');
+            if (!svgElement || !hospitals || hospitals.length === 0 || !hospitalLayer) {
+                console.warn("Data Rumah Sakit atau layer 'hospital-layer' tidak ditemukan.");
+                return;
             }
-        });
-    } else {
-        console.error("Gagal menemukan elemen #provinsi-select-detail."); // DEBUG
-    }
 
+            hospitals.forEach(hospital => {
+                const xPos = '50%';
+                const yPos = '50%';
 
-    function getClassNameByPersentase(p) {
-        if (p >= 81) return 'color-81-100';
-        if (p >= 61) return 'color-61-80';
-        if (p >= 41) return 'color-41-60';
-        if (p >= 21) return 'color-21-40';
-        return 'color-0-20';
-    }
+                const hospitalDiv = document.createElement('div');
+                hospitalDiv.className = 'hospital-item';
+                hospitalDiv.style.position = 'absolute';
+                hospitalDiv.style.left = xPos;
+                hospitalDiv.style.top = yPos;
+                hospitalDiv.style.transform = 'translate(-50%, -50%)'; 
 
-    const mapShape = document.getElementById('kabupaten-shape');
-        if (mapShape) {
-            const colorClass = getClassNameByPersentase(kabupaten.persentase);
-            mapShape.classList.add(colorClass); 
-            mapShape.style.fill = ''; 
-        } else {
-            console.error("GAGAL: Tidak menemukan path dengan id='kabupaten-shape'");
-    }
+                // === PERIKSA NAMA FILE INI ===
+                hospitalDiv.innerHTML = `
+                    <img src="{{ asset('images/hospital_icon.png') }}" alt="Ikon RS">
+                    <span>${hospital.nama_rs}</span>
+                `;
+                
+                hospitalLayer.appendChild(hospitalDiv);
 
-    const hospitalLayer = document.getElementById('hospital-layer');
-    if (hospitals.length > 0 && svgElement && hospitalLayer) {
-        const viewBox = svgElement.viewBox.baseVal;
+                // Tambahkan event tooltip
+
+                hospitalDiv.addEventListener('click', function() {
+                    window.location.href = `/hospital/${hospital.id}`;
+                });
+
+                hospitalDiv.addEventListener('mouseover', () => {
+                    tooltip.innerHTML = `<strong>${hospital.nama_rs}</strong>`;
+                    tooltip.classList.remove('hidden');
+                });
+                hospitalDiv.addEventListener('mouseleave', () => {
+                    tooltip.classList.add('hidden');
+                });
+                hospitalDiv.addEventListener('mousemove', (e) => {
+                    tooltip.style.left = (e.pageX + 15) + 'px';
+                    tooltip.style.top = (e.pageY + 15) + 'px';
+                });
+            });
+        }
         
-        hospitals.forEach(hospital => {
-            const paddingX = viewBox.width * 0.2;
-            const paddingY = viewBox.height * 0.2;
-            const randX = (Math.random() * (viewBox.width - paddingX * 2)) + paddingX + viewBox.x;
-            const randY = (Math.random() * (viewBox.height - paddingY * 2)) + paddingY + viewBox.y;
-            const iconSize = 2; 
-            const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            image.setAttribute('href', '{{ asset('images/hospital_icon.png') }}');
-            image.setAttribute('x', randX - (iconSize / 2));
-            image.setAttribute('y', randY - (iconSize / 2));
-            image.setAttribute('width', iconSize);
-            image.setAttribute('height', iconSize);
-            
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', randX);
-            text.setAttribute('y', randY + iconSize); 
-            text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('class', 'hospital-label');
-            text.style.fontSize = "0.5px"; 
-            text.textContent = hospital.nama_rs;
+        // 3. JALANKAN KODE UTAMA
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
 
-            hospitalLayer.appendChild(image);
-            hospitalLayer.appendChild(text);
-        });
-    }
-});
+        const mapShape = document.getElementById('kabupaten-shape'); 
+        if (mapShape && kabupaten) { 
+            const colorClass = getClassNameByPersentase(kabupaten.persentase); 
+            mapShape.classList.add(colorClass); 
+        } else {
+            console.error("GAGAL: Tidak menemukan path #kabupaten-shape atau data 'kabupaten' tidak ada. Pastikan file SVG Anda memiliki <path id='kabupaten-shape'>.");
+        }
+
+        if (provinsiSelectDetail) {
+            provinsiSelectDetail.addEventListener('change', function() {
+                const selectedValue = this.value;
+                if (selectedValue === 'all') { window.location.href = '/'; }
+                else { window.location.href = `/provinsi/${selectedValue}`; }
+            });
+        }
+        addPointsOfInterest();
+        
+    });
 </script>
 </body>
 </html>

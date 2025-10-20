@@ -8,12 +8,12 @@ class HospitalSeeder extends Seeder
 {
     public function run()
     {
-        $jaksel = Kabupaten::where('nama', 'Jakarta Selatan')->first();
+        $jaksel = Kabupaten::where('nama', 'Kota Adm. Jakarta Selatan')->first();
         $semarang = Kabupaten::where('nama', 'Kota Semarang')->first();
         $surabaya = Kabupaten::where('nama', 'Surabaya')->first();
 
         if ($jaksel) {
-            Hospital::create(['kabupaten_id' => $jaksel->id, 'nama_rs' => 'Rumah Sakit A']);
+            Hospital::create(['kabupaten_id' => $jaksel->id, 'nama_rs' => 'RS INAHEF']);
         }
         if ($semarang) {
             Hospital::create(['kabupaten_id' => $semarang->id, 'nama_rs' => 'Rumah Sakit B']);

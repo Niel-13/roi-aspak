@@ -361,6 +361,15 @@
                 groupWrapper.appendChild(pulseCircle);
                 groupWrapper.appendChild(mainCircle);
                 
+                groupWrapper.addEventListener('click', function(event) {
+                event.stopPropagation();
+                if (point.kabupaten_id) {
+                    window.location.href = `/kabupaten/${point.kabupaten_id}`;
+                } else {
+                    window.location.href = `/provinsi/${targetProvinsiName}`;
+                }
+            });
+
                 groupWrapper.addEventListener('mouseover', () => {
                     tooltip.innerHTML = `<strong>${point.nama}</strong><br>${point.alamat}`;
                     tooltip.classList.remove('hidden');

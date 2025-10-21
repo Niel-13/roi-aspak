@@ -6,83 +6,160 @@
     <title>Detail RS: {{ $hospital->nama_rs }}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f2f5; }
-        
-        /* Tombol Lantai */
-        .floor-button {
-            background-color: #fff; border: 1px solid #ccc;
-            padding: 8px 16px; margin-bottom: 5px; border-radius: 6px;
-            cursor: pointer; transition: background-color 0.2s;
-        }
-        .floor-button:hover { background-color: #f0f0f0; }
-        .floor-button.active {
-            background-color: #007bff; color: white; border-color: #007bff;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
         }
 
-        /* Area Denah */
+        /* Header modern */
+        .header {
+            background: linear-gradient(90deg, #007bff, #005fcc);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-weight: 600;
+        }
+
+        /* Floor button modern */
+        .floor-button {
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            padding: 8px 14px;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .floor-button:hover {
+            background-color: #e0f2fe;
+            transform: translateY(-2px);
+        }
+        .floor-button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 3px 6px rgba(0,123,255,0.3);
+        }
+
+        /* Floor plan container */
         #floor-plan-container {
             position: relative;
             width: 100%;
-            border: 1px solid #ccc;
-            background-color: #fafafa;
+            background: #ffffff;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: box-shadow 0.3s;
+        }
+        #floor-plan-container:hover {
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
         }
         #floor-plan-image {
             width: 100%;
             height: auto;
-            display: block;
-        }
-        
-        /* Titik Ruangan */
-        .room-dot {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: rgba(0, 123, 255, 0.7);
-            border: 2px solid white;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            
-            /* Trik untuk menengahkan titik */
-            transform: translate(-50%, -50%);
-        }
-        .room-dot:hover {
-            transform: translate(-50%, -50%) scale(1.5);
-            background-color: rgba(0, 80, 200, 0.9);
         }
 
-        /* Sidebar Produk */
-        #product-list { height: 60vh; overflow-y: auto; } /* Atur tinggi sidebar */
-        .product-card {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fff;
+        .room-path {
+            transition: fill 0.2s ease-in-out;
+            cursor: pointer;
         }
-        .product-card img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-right: 12px;
+        .room-path:hover {
+            fill: #93c5fd;
         }
-        .availability-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+        .room-path.active-room {
+            fill: #2563eb !important;
+        }
+
+        /* Product card modern */
+        #product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            height: 60vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .product-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            background: #ffffff;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+        }
+        .product-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .product-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Availability bar modern */
+        .availability-bar {
+            width: 40px;
+            height: 10px;
+            border-radius: 0.25rem;
+            margin-right: 6px;
+        }
+        .avail-green { background-color: #22c55e; }
+        .avail-yellow { background-color: #facc15; }
+        .avail-red { background-color: #ef4444; }
+
+        /* Detail button */
+        .detail-button {
+            background-color: #2563eb;
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .detail-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Legend modern */
+        .availability-legend {
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        .availability-legend span {
+            width: 16px;
+            height: 16px;
             display: inline-block;
-            margin-right: 4px;
+            border-radius: 0.25rem;
+            margin-right: 6px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col h-screen">
 
-    <div class="header shadow-md p-4 grid grid-cols-3 items-center bg-white">
+<body class="flex flex-col h-screen">
+
+    <!-- Header -->
+    <div class="header shadow-md p-4 grid grid-cols-3 items-center">
         <div class="flex items-center space-x-4">
-             <select id="provinsi-select-detail" class="border rounded-md py-1 px-3 pr-8 text-sm ...">
+            <select id="provinsi-select-detail" class="border rounded-md py-1 px-3 text-sm text-gray-700">
                 <option value="all">Kementerian Kesehatan</option>
                 @foreach($all_provinsis as $nama_prov => $data_prov)
                     <option value="{{ $nama_prov }}" @selected($nama_prov == $provinsi->nama)>
@@ -91,133 +168,142 @@
                 @endforeach
             </select>
         </div>
-        <div class="navbar flex space-x-1 justify-center items-center">
-            <h1 class="text-lg font-semibold">{{ $kabupaten->nama }}</h1>
+
+        <div class="navbar flex justify-center">
+            <h1 class="text-lg font-semibold tracking-wide">{{ $kabupaten->nama }}</h1>
         </div>
-        <h1 class="text-xl font-semibold text-gray-700 text-right">ASPAK KEMENKES</h1>
+
+        <h1 class="text-lg font-bold text-right tracking-wide">ASPAK KEMENKES</h1>
     </div>
 
-    <div class="flex-grow overflow-auto p-4">
-        
+    <!-- Main content -->
+    <div class="flex-grow overflow-auto p-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ $hospital->nama_rs }}</h2>
 
-        <div class="flex space-x-4">
-
-            <div class="w-2/3">
-                <div class="flex space-x-2 mb-2">
+        <div class="flex space-x-6 items-start">
+            <!-- Left: Floor plan -->
+            <div class="w-1/2">
+                <div class="flex flex-wrap gap-2 mb-3">
                     @foreach($floors as $floor)
-                        <button class="floor-button {{ $floor->id == $currentFloor->id ? 'active' : '' }}" 
+                        <button class="floor-button {{ $floor->id == $currentFloor->id ? 'active' : '' }}"
                                 data-floor-id="{{ $floor->id }}"
                                 data-denah-src="{{ asset($floor->gambar_denah) }}">
                             {{ $floor->nama_lantai }}
                         </button>
                     @endforeach
                 </div>
-                
-               <div id="floor-plan-container">
 
-                    @if ($currentFloor)
-                        {{-- Tampilkan denah HANYA JIKA ada data lantai --}}
-                        <img id="floor-plan-image" src="{{ asset($currentFloor->gambar_denah) }}" alt="Denah Lantai">
-                        
-                        <div id="room-layer">
-                            @foreach($rooms as $room)
-                                <div class="room-dot" 
-                                     title="{{ $room->nama_ruangan }}" 
-                                     data-room-id="{{ $room->id }}"
-                                     style="left: {{ $room->posisi_x }}; top: {{ $room->posisi_y }};">
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        {{-- Tampilkan pesan jika tidak ada data lantai --}}
-                        <div class_name="p-10 text-center text-gray-500">
-                            <p>Data denah untuk rumah sakit ini belum tersedia.</p>
-                        </div>
-                    @endif
-
+                <div id="floor-plan-container" class="p-4 shadow-lg rounded-lg bg-white h-[60vh] overflow-auto">
+                    @php
+                        $pathSvg = public_path('images/denah/' . $namaFileDenah);
+                        if (file_exists($pathSvg)) {
+                            echo file_get_contents($pathSvg);
+                        } else {
+                            echo "<p class='text-red-500'>Data denah belum tersedia untuk lantai ini.</p>";
+                        }
+                    @endphp
                 </div>
             </div>
 
-            <div class="w-1/3">
-                <div class="bg-white p-4 shadow-md rounded-lg">
+            <!-- Right: Product list -->
+            <div class="w-1/2">
+                <div class="bg-white p-5 shadow-lg rounded-lg h-[60vh] flex flex-col justify-between">
                     <h3 class="font-semibold text-lg mb-2">Daftar Produk</h3>
-                    <p id="room-name" class="text-md font-bold text-blue-600 mb-2">Pilih ruangan untuk melihat produk...</p>
-                    
-                    <div id="product-list" class="space-y-3">
+                    <p id="room-name" class="text-md font-bold text-blue-600 mb-3">Pilih ruangan di denah...</p>
+                    <div id="product-list"></div>
+
+                    <div class="mt-6 border-t pt-4 availability-legend">
+                        <div class="flex items-center mb-2">
+                            <span class="avail-green"></span><p>&gt; 70% Tersedia</p>
                         </div>
+                        <div class="flex items-center mb-2">
+                            <span class="avail-yellow"></span><p>50–70%</p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="avail-red"></span><p>&lt; 50%</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
-    </div> 
-    <script>
+    </div>
+
+<script>
 document.addEventListener('DOMContentLoaded', function () {
-    const roomLayer = document.getElementById('room-layer');
+    const roomsData = @json($rooms);
+    const svgElement = document.querySelector('#floor-plan-container svg');
     const productList = document.getElementById('product-list');
     const roomNameEl = document.getElementById('room-name');
     const provinsiSelectDetail = document.getElementById('provinsi-select-detail');
+    const floorButtons = document.querySelectorAll('.floor-button');
+    const currentUrl = window.location.pathname;
 
-    // Tambahkan event listener ke semua titik ruangan
-    roomLayer.querySelectorAll('.room-dot').forEach(dot => {
-        dot.addEventListener('click', function() {
-            const roomId = this.dataset.roomId;
-            const roomName = this.getAttribute('title');
-            
-            roomNameEl.textContent = `Produk di: ${roomName}`;
-            productList.innerHTML = '<p>Memuat produk...</p>'; // Tampilkan placeholder
-
-            // Panggil API untuk mengambil data produk
-            fetch(`/api/rooms/${roomId}/products`)
-                .then(response => response.json())
-                .then(products => {
-                    productList.innerHTML = ''; // Kosongkan daftar
-
-                    if (products.length === 0) {
-                        productList.innerHTML = '<p>Tidak ada produk di ruangan ini.</p>';
-                        return;
-                    }
-
-                    // Bangun HTML untuk setiap produk
-                    products.forEach(product => {
-                        const availabilityClass = product.ketersediaan ? 'bg-green-500' : 'bg-red-500';
-                        const availabilityText = product.ketersediaan ? 'Tersedia' : 'Tidak Tersedia';
-
-                        const productHtml = `
-                            <div class="product-card">
-                                <img src="{{ asset('/') }}${product.gambar_produk}" alt="${product.nama_produk}">
-                                <div class="flex-grow">
-                                    <h4 class="font-bold">${product.nama_produk}</h4>
-                                    <p class="text-sm">
-                                        <span class="availability-dot ${availabilityClass}"></span>
-                                        ${availabilityText}
-                                    </p>
-                                </div>
-                                <a href="${product.link_detail || '#'}" target="_blank" 
-                                   class="bg-blue-500 text-white text-xs py-1 px-3 rounded hover:bg-blue-600">
-                                   Detail
-                                </a>
-                            </div>
-                        `;
-                        productList.insertAdjacentHTML('beforeend', productHtml);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching products:', error);
-                    productList.innerHTML = '<p class="text-red-500">Gagal memuat produk.</p>';
-                });
+    floorButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.classList.contains('active')) return;
+            const floorId = this.dataset.floorId;
+            window.location.href = `${currentUrl}?floor=${floorId}`;
         });
     });
-    
-    if (provinsiSelectDetail) {
-            provinsiSelectDetail.addEventListener('change', function() {
-                const selectedValue = this.value;
-                if (selectedValue === 'all') { window.location.href = '/'; }
-                else { window.location.href = `/provinsi/${selectedValue}`; }
-            });
-        }
 
-    });
+    function getAvailabilityClasses(percent) {
+        if (percent > 70) return 'avail-green';
+        else if (percent >= 50) return 'avail-yellow';
+        else return 'avail-red';
+    }
+
+    if (svgElement) {
+        for (const kodeSvg in roomsData) {
+            const roomData = roomsData[kodeSvg];
+            const pathElement = svgElement.querySelector(`#${kodeSvg}`);
+            if (pathElement) {
+                pathElement.classList.add('room-path');
+                pathElement.addEventListener('click', function() {
+                    svgElement.querySelectorAll('.room-path.active-room').forEach(p => p.classList.remove('active-room'));
+                    this.classList.add('active-room');
+                    const roomId = roomData.id;
+                    roomNameEl.textContent = `Produk di: ${roomData.nama_ruangan}`;
+                    productList.innerHTML = '<p>Memuat produk...</p>';
+
+                    fetch(`/api/rooms/${roomId}/products`)
+                        .then(res => res.json())
+                        .then(products => {
+                            productList.innerHTML = '';
+                            if (products.length === 0) {
+                                productList.innerHTML = '<p class="text-gray-500">Tidak ada produk di ruangan ini.</p>';
+                                return;
+                            }
+                            products.forEach(product => {
+                                const availClass = getAvailabilityClasses(product.persentase);
+                                const html = `
+                                    <div class="product-item">
+                                        <img src="{{ asset('/') }}${product.gambar_produk}" alt="${product.nama_produk}">
+                                        <h5 class="font-semibold text-sm mt-1">${product.nama_produk}</h5>
+                                        <div class="flex justify-center items-center mt-2">
+                                            <span class="availability-bar ${availClass}"></span>
+                                            <a href="${product.link_detail || '#'}" target="_blank" class="detail-button">Detail</a>
+                                        </div>
+                                    </div>`;
+                                productList.insertAdjacentHTML('beforeend', html);
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            productList.innerHTML = '<p class="text-red-500">Gagal memuat produk.</p>';
+                        });
+                });
+            }
+        }
+    }
+
+    if (provinsiSelectDetail) {
+        provinsiSelectDetail.addEventListener('change', function() {
+            const val = this.value;
+            if (val === 'all') window.location.href = '/';
+            else window.location.href = `/provinsi/${val}`;
+        });
+    }
+});
 </script>
 </body>
 </html>

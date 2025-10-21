@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    protected $fillable = ['floor_id', 'nama_ruangan', 'posisi_x', 'posisi_y'];
+    protected $fillable = ['floor_id', 'nama_ruangan', 'kode_svg'];
     public function floor() {
         return $this->belongsTo(Floor::class);
     }

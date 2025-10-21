@@ -1,211 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASPAK KEMENKES</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-        }
-        .header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .navbar a {
-            padding: 0.5rem 1rem;
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .navbar a:hover {
-            background-color: #f0f0f0;
-            border-radius: 0.25rem;
-        }
-        .navbar a.active {
-            background-color: #007bff;
-            color: #ffffff;
-            border-radius: 0.25rem;
-        }
-        .legend-box {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-            border-radius: 3px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASPAK KEMENKES</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
 
-        .color-81-100 { fill: #2D9CDB; } /* Biru terang */
-        .color-61-80 { fill: #34D399; } /* Hijau terang */
-        .color-41-60 { fill: #FFFF00; } /* Kuning */
-        .color-21-40 { fill: #FFA500; } /* Orange */
-        .color-0-20 { fill: #EF4444; } /* Merah */
+    /* HEADER */
+    .header {
+      background: linear-gradient(90deg, #007bff, #2563eb);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .navbar a {
+      padding: 0.4rem 0.4rem;
+      font-weight: 500;
+      border-radius: 0.25rem;
+      transition: all 0.2s ease-in-out;
+    }
+    .navbar a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .navbar a.active {
+      background-color: white;
+      color: #2563eb;
+      font-weight: 600;
+    }
 
-        /* SVG styles */
-        #indonesia-map path {
-            stroke: #fff;
-            stroke-width: 0.5px;
-            transition: fill 0.3s ease;
-        }
-        #indonesia-map path:hover {
-            fill-opacity: 0.8;
-            cursor: pointer;
-        }
+    /* LEGEND */
+    .legend-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    #map-legend {
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        #map-tooltip {
-        pointer-events: none; 
-        transition: opacity 0.2s;
-        }
+    /* TOOLTIP */
+    #map-tooltip {
+      position: absolute;
+      z-index: 9999;
+      pointer-events: none;
+      background: rgba(30, 41, 59, 0.9);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: opacity 0.15s ease;
+    }
 
-        .poi-dot {
-        fill: #ff0000; 
-        stroke: #fff;
-        stroke-width: 1px;
-        cursor: pointer;
-        }
+    /* MAP & DOTS */
+    #map-container {
+      position: relative;
+      overflow: visible;
+      border-radius: 0.75rem;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
 
-        .poi-dot:hover {
-            fill: #cc0000; 
-        }
+    #indonesia-map path {
+      stroke: #fff;
+      stroke-width: 0.5px;
+      transition: fill 0.3s ease;
+    }
+    #indonesia-map path:hover {
+      fill-opacity: 0.8;
+      cursor: pointer;
+    }
 
-        @keyframes pulse {
-            0% { r: 3px; opacity: 1; }
-            50% { r: 8px; opacity: 0.5; }
-            100% { r: 3px; opacity: 1; }
-        }
-        .poi-pulse {
-            animation: pulse 2s infinite;
-        }
+    .poi-dot {
+      fill: #ff3b3b;
+      stroke: #fff;
+      stroke-width: 1px;
+      cursor: pointer;
+    }
+    .poi-dot:hover {
+      fill: #c91818;
+    }
 
-        #map-container {
-        position: relative;
-        overflow: hidden;
-        }
+    @keyframes pulse {
+      0% {
+        r: 3px;
+        opacity: 1;
+      }
+      50% {
+        r: 7px;
+        opacity: 0.5;
+      }
+      100% {
+        r: 3px;
+        opacity: 1;
+      }
+    }
+    .poi-pulse {
+      animation: pulse 2s infinite;
+    }
 
-        #map-container svg {
-        position: relative;
-        z-index: 1;
-        }
+    /* ZOOM CONTROL */
+    .zoom-controls button {
+      width: 36px;
+      height: 36px;
+      font-weight: bold;
+      border-radius: 0.4rem;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s ease, opacity 0.1s;
+    }
 
-        #map-tooltip {
-        position: absolute;
-        z-index: 9999;
-        pointer-events: none;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        white-space: nowrap;
-        }
+    .zoom-controls button:hover {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
 
-        #kondisi-kabuapaten,
-        #rekomendasi-kabupaten {
-        position: relative;
-        z-index: 9998;
-        }
-
-        #map-container .zoom-controls {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        }
-    </style>
+    /* COLORS */
+    .color-81-100 { fill: #2D9CDB; }
+    .color-61-80 { fill: #34D399; }
+    .color-41-60 { fill: #FFFF00; }
+    .color-21-40 { fill: #FFA500; }
+    .color-0-20 { fill: #EF4444; }
+  </style>
 </head>
-<body class="bg-gray-100 flex flex-col h-screen">
-    <div id="map-tooltip" class="hidden absolute bg-gray-800 text-white text-sm rounded-md py-1 px-2 shadow-lg"></div>
-    <div class="header shadow-md p-4 flex justify-between items-center bg-white">
-        <div class="flex items-center space-x-4">
-            <div class="relative">
-                <input type="text" placeholder="Pencarian" class="border rounded-md py-1 px-3 pl-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <svg class="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            <div class="relative">
-                <select id="provinsi-select-detail" class="border rounded-md py-1 px-3 pr-8 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
-                    <option value="all">Kementerian Kesehatan</option>
-                    @foreach($all_provinsis as $nama_prov => $data_prov)
-                        <option value="{{ $nama_prov }}" @selected($nama_prov == $provinsi->nama)>
-                           Dinas Kesehatan {{ $nama_prov }}
-                        </option>
-                    @endforeach
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-            </div>
+<body class="flex flex-col h-screen">
+  <!-- Tooltip -->
+  <div id="map-tooltip" class="hidden"></div>
+
+  <!-- HEADER -->
+  <div class="header shadow-md p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      <!-- Search -->
+      <div class="relative">
+        <input type="text" placeholder="Pencarian..." class="border rounded-md py-1 px-3 pl-8 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+
+      <!-- Dropdown -->
+      <div class="relative">
+        <select id="provinsi-select-detail" class="border rounded-md py-1 px-3 pr-8 text-sm bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+          <option value="all">Kementerian Kesehatan</option>
+          @foreach($all_provinsis as $nama_prov => $data_prov)
+            <option value="{{ $nama_prov }}" @selected($nama_prov == $provinsi->nama)>
+              Dinas Kesehatan {{ $nama_prov }}
+            </option>
+          @endforeach
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
         </div>
+      </div>
+    </div>
 
-        <h1 class="text-xl font-semibold text-gray-700 text-center">ASPAK KEMENKES</h1>
+    <h1 class="text-lg font-semibold tracking-wide text-center">ASPAK KEMENKES</h1>
 
-        <div class="navbar flex space-x-1 text-center justify-center items-center">
+    <!-- Navbar -->
+    <div class="navbar flex space-x-1 text-center justify-center items-center">
             <a href="#" class="active text-sm py-1 px-3 rounded-md">Rumah Sakit</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Sarana</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Prasarana</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Alat Kesehatan</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">Bahan</a>
             <a href="#" class="text-sm py-1 px-3 rounded-md">SDM</a>
+    </div>
+  </div>
+
+  <!-- MAP SECTION -->
+  <div class="w-full px-6 py-6 flex flex-col space-y-6 overflow-visible">
+    <div id="map-container" class="w-full p-4 shadow-md rounded-lg relative">
+      @php
+      $pathSvg = public_path('images/maps/' . $namaFileSvg);
+      if (file_exists($pathSvg)) {
+          echo file_get_contents($pathSvg);
+      } else {
+          echo "<p class='text-red-500'>Peta belum tersedia.</p>";
+      }
+      @endphp
+
+      <!-- LEGEND -->
+      <div
+        id="map-legend"
+        class="absolute bottom-4 left-4 p-3 text-xs text-gray-800"
+      >
+        <h3 class="font-semibold mb-2">Legend</h3>
+        <div class="space-y-1">
+          <div><span class="legend-box" style="background:#2D9CDB"></span>81–100%</div>
+          <div><span class="legend-box" style="background:#34D399"></span>61–80%</div>
+          <div><span class="legend-box" style="background:#FFFF00"></span>41–60%</div>
+          <div><span class="legend-box" style="background:#FFA500"></span>21–40%</div>
+          <div><span class="legend-box" style="background:#EF4444"></span>0–20%</div>
         </div>
+      </div>
+
+      <!-- TIME -->
+      <div class="absolute bottom-4 right-4 text-center space-x-2">
+        <span
+          id="current-date"
+          class="inline-block bg-blue-600 text-white font-semibold py-1 px-3 rounded shadow"
+        ></span>
+        <span
+          id="current-time"
+          class="inline-block bg-white text-gray-900 font-semibold py-1 px-3 rounded shadow"
+        ></span>
+      </div>
     </div>
 
-        <div class="w-full px-6 pb-6 pt-6 max-h-[65vh]">
-        <div class="w-full bg-white p-4 shadow-md rounded-lg">
-            <div id="map-container" class="w-full h-auto relative">
-                @php
-                    $pathSvg = public_path('images/maps/' . $namaFileSvg); 
-                    if (file_exists($pathSvg)) {
-                        echo file_get_contents($pathSvg); 
-                    } else {
-                        echo "<p class='text-red-500'>Peta untuk provinsi ini belum tersedia. Pastikan file '{$namaFileSvg}' ada</p>";
-                    }
-                @endphp
-
-                <div id="map-legend" class="absolute bottom-4 left-4 bg-gray-200 bg-opacity-80 p-3 rounded-md shadow text-xs z-10">
-                <h3 class="font-semibold mb-2">Legend</h3>
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <span class="legend-box" style="background-color: #2D9CDB;"></span> <span>81-100%</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="legend-box" style="background-color: #34D399;"></span> <span>61-80%</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="legend-box" style="background-color: #FFFF00;"></span> <span>41-60%</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="legend-box" style="background-color: #FFA500;"></span> <span>21-40%</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="legend-box" style="background-color: #EF4444;"></span> <span>0-20%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="w-full px-6 pb-6 text-center relative z-10">
-                    <p class="inline-block text-base font-bold bg-blue-700 text-white rounded py-1 px-4 mr-1 shadow" id="current-date">
-                    </p>
-                    <p class="inline-block text-base font-bold bg-white text-black rounded py-1 px-4 ml-1 shadow" id="current-time">
-                    </p>
-                </div>
-            </div>
+    <!-- INFO PANELS -->
+    <div class="flex space-x-6">
+      <div class="w-1/2 bg-white p-5 shadow-md rounded-lg">
+        <h3 class="font-semibold text-lg mb-2">Kondisi:</h3>
+        <div id="kondisi-kabupaten" class="text-gray-700 space-y-1">
+          <p>Pilih kota/kabupaten untuk melihat kondisi.</p>
         </div>
+      </div>
+      <div class="w-1/2 bg-white p-5 shadow-md rounded-lg">
+        <h3 class="font-semibold text-lg mb-2">Rekomendasi:</h3>
+        <p id="rekomendasi-kabupaten" class="text-gray-700">
+          Rekomendasi akan muncul di sini.
+        </p>
+      </div>
     </div>
-
-    <div class="w-full px-6 pb-6 flex space-x-6">
-        <div class="w-1/2 bg-white p-4 shadow-md rounded-lg">
-            <h3 class="font-semibold text-lg mb-2">Kondisi:</h3>
-            <div id="kondisi-kabupaten" class="text-gray-700 space-y-1">
-                <p>Pilih kota/kabupaten untuk melihat kondisi.</p>
-            </div>
-        </div>
-        <div class="w-1/2 bg-white p-4 shadow-md rounded-lg">
-            <h3 class="font-semibold text-lg mb-2">Rekomendasi:</h3>
-            <p id="rekomendasi-kabupaten" class="text-gray-700">Rekomendasi akan muncul di sini.</p>
-        </div>
-    </div>
+  </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

@@ -15,9 +15,9 @@ public function up()
         $table->id();
         $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
         $table->string('nama_produk');
-        $table->string('gambar_produk'); // Path ke gambar produk
-        $table->boolean('ketersediaan')->default(true); // Availability (true/false)
-        $table->string('link_detail')->nullable(); // Link eksternal untuk tombol detail
+        $table->string('gambar_produk');
+        $table->integer('persentase')->default(0);
+        $table->string('link_detail')->nullable();
         $table->timestamps();
     });
 }

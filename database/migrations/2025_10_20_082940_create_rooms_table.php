@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('floor_id')->constrained('floors')->onDelete('cascade');
-            $table->string('nama_ruangan'); // Misal: "Ruang Operasi 1"
-            $table->string('posisi_x'); // Posisi X dalam persen (misal: "30%")
-            $table->string('posisi_y'); // Posisi Y dalam persen (misal: "50%")
+            $table->string('nama_ruangan');
+            $table->string('posisi_x');
+            $table->string('posisi_y');
             $table->timestamps();
         });
     }

@@ -21,8 +21,7 @@ class HospitalLayoutSeeder extends Seeder
                 'gambar_denah' => 'rs_a_lt_1.svg'
             ]);
             
-            Room::create(['floor_id' => $lantai1_rsA->id, 'nama_ruangan' => 'Ruang UGD', 'kode_svg' => 'ruang-ugd']);
-            Room::create(['floor_id' => $lantai1_rsA->id, 'nama_ruangan' => 'Ruang Operasi 1', 'kode_svg' => 'ruang-operasi-1']);
+            $this->createRoomsForFloor($lantai1_rsA->id);
 
             $lantai2_rsA = Floor::create([
                 'hospital_id' => $rsA->id,
@@ -30,8 +29,7 @@ class HospitalLayoutSeeder extends Seeder
                 'gambar_denah' => 'rs_a_lt_2.svg'
             ]);
 
-            Room::create(['floor_id' => $lantai2_rsA->id, 'nama_ruangan' => 'Kamar 201', 'kode_svg' => 'kamar-201']);
-            Room::create(['floor_id' => $lantai2_rsA->id, 'nama_ruangan' => 'Kamar 202', 'kode_svg' => 'kamar-202']);
+            $this->createRoomsForFloor($lantai2_rsA->id);
         }
 
         $rsB = Hospital::where('nama_rs', 'Rumah Sakit B')->first();
@@ -80,11 +78,13 @@ class HospitalLayoutSeeder extends Seeder
             ['nama' => 'PERSALINAN', 'kode_svg' => 'persalinan', 'persentase' => 65],
             ['nama' => 'RANAP', 'kode_svg' => 'ranap-3', 'persentase' => 65],
             ['nama' => 'MEKANIK', 'kode_svg' => 'mekanik', 'persentase' => 25], 
-            ['nama' => 'GZI', 'kode_svg' => 'gzi', 'persentase' => 25],
+            ['nama' => 'GIZI', 'kode_svg' => 'gizi', 'persentase' => 25],
             ['nama' => 'LAUNDRY', 'kode_svg' => 'laundry', 'persentase' => 25],
             ['nama' => 'CSSD', 'kode_svg' => 'cssd', 'persentase' => 25],
             ['nama' => 'R. FORENSIK & JENAZAH', 'kode_svg' => 'r-forensik-jenazah', 'persentase' => 65],
-            ['nama' => 'FARMASI SENTRAL', 'kode_svg' => 'farmasi-sentral', 'persentase' => 65]
+            ['nama' => 'FARMASI SENTRAL', 'kode_svg' => 'farmasi-sentral', 'persentase' => 65],
+            ['nama' => 'SCHNEIDER', 'kode_svg' => 'schneider', 'persentase' => 70],
+            ['nama' => 'ITS', 'kode_svg' => 'its', 'persentase' => 74]
         ];
 
         foreach ($roomsData as $room) {
@@ -156,7 +156,8 @@ class HospitalLayoutSeeder extends Seeder
                 Product::insert([
                     ['room_id' => $newRoom->id, 'nama_produk' => 'Patient Monitor', 'gambar_produk' => 'images/produk/patient_monitor.png', 'persentase' => 80, 'link_detail' => 'https://app.aspak-kemenkes.cloud/bmsdashboard'],
                     ['room_id' => $newRoom->id, 'nama_produk' => 'Infant Warmer', 'gambar_produk' => 'images/produk/infant_warmer.png', 'persentase' => 75, 'link_detail' => 'https://example.com/infant-warmer'],
-                    ['room_id' => $newRoom->id, 'nama_produk' => 'Timbangan (SECA)', 'gambar_produk' => 'images/produk/seca.png', 'persentase' => 30, 'link_detail' => 'https://app.aspak-kemenkes.cloud/dashseca']                ]);
+                    ['room_id' => $newRoom->id, 'nama_produk' => 'Timbangan (SECA)', 'gambar_produk' => 'images/produk/seca.png', 'persentase' => 30, 'link_detail' => 'https://app.aspak-kemenkes.cloud/dashseca']                
+                ]);
                 break;
 
             case 'ranap-1':
@@ -223,7 +224,7 @@ class HospitalLayoutSeeder extends Seeder
                 ]);
                 break;
 
-            case 'hd_bank_darah':
+            case 'hd-bank-darah':
             Product::insert([
                 ['room_id' => $newRoom->id, 'nama_produk' => 'Dialysis Machine','gambar_produk' => 'images/produk/dialysis_machine.png','persentase' => 85, 'link_detail' => 'https://example.com/dialysis-machine'],
                 ['room_id' => $newRoom->id, 'nama_produk' => 'Blood Bank Refrigerator', 'gambar_produk' => 'images/produk/blood_bank_refrigerator.png', 'persentase' => 80, 'link_detail' => 'https://example.com/blood-bank-refrigerator'],
@@ -252,6 +253,18 @@ class HospitalLayoutSeeder extends Seeder
                     ['room_id' => $newRoom->id, 'nama_produk' => 'Autopsy Table', 'gambar_produk' => 'images/produk/autopsy_table.png', 'persentase' => 80, 'link_detail' => 'https://example.com/autopsy-table'],
                     ['room_id' => $newRoom->id, 'nama_produk' => 'Cold Storage', 'gambar_produk' => 'images/produk/cold_storage.png', 'persentase' => 85, 'link_detail' => 'https://example.com/cold-storage'],
                     ['room_id' => $newRoom->id, 'nama_produk' => 'Instrument Cabinet', 'gambar_produk' => 'images/produk/instrument_cabinet.png', 'persentase' => 70, 'link_detail' => 'https://example.com/instrument-cabinet']
+                ]);
+                break;
+
+            case 'schneider':
+                Product::insert([
+                    ['room_id' => $newRoom->id, 'nama_produk' => 'BMS (Schneider)', 'gambar_produk' => 'images/produk/bms.png', 'persentase' => 80, 'link_detail' => 'https://app.aspak-kemenkes.cloud/bmsdashboard'],
+                ]);
+                break;
+
+            case 'its':
+                Product::insert([
+                    ['room_id' => $newRoom->id, 'nama_produk' => 'Timbangan (SECA)', 'gambar_produk' => 'images/produk/seca.png', 'persentase' => 30, 'link_detail' => 'https://app.aspak-kemenkes.cloud/dashseca']
                 ]);
                 break;
         }

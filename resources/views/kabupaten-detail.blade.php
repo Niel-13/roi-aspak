@@ -179,9 +179,11 @@
       </div>
 
       <!-- Time display -->
-      <div class="absolute bottom-4 right-4 text-center space-x-2">
+      <div class="absolute bottom-4 w-full flex justify-center">
+        <div class="text-center space-x-2">
         <span id="current-date" class="inline-block bg-blue-600 text-white font-semibold py-1 px-3 rounded shadow"></span>
         <span id="current-time" class="inline-block bg-white text-gray-900 font-semibold py-1 px-3 rounded shadow"></span>
+      </div>
       </div>
     </div>
 
